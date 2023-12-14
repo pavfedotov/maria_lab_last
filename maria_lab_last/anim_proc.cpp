@@ -133,21 +133,22 @@ BOOL  anim_main(HWND hwnd)
 	Mercury.vt.x = X_SPACE_ANIM / 2 + 10 * cos(dk);
 	Mercury.vt.y = Y_SPACE_ANIM / 2 + 10 * sin(dk);
 	Mercury.move();
-
+	TextOut(hdc, Mercury.kvadro_win[0].x, Mercury.kvadro_win[0].y, "меркурий", 8);
 	dk = double(timer + 1000) / (ALL_STEP / 4);
 	Venera.vt.x = X_SPACE_ANIM / 2 + 20 * cos(dk);
 	Venera.vt.y = Y_SPACE_ANIM / 2 + 20 * sin(dk);
 	Venera.move();
-
+	TextOut(hdc, Venera.kvadro_win[0].x, Venera.kvadro_win[0].y, "венера", 6);
 	dk = double(timer + 3000) / (ALL_STEP / 2);
 	Mars.vt.x = X_SPACE_ANIM / 2 + 40 * cos(dk);
 	Mars.vt.y = Y_SPACE_ANIM / 2 + 40 * sin(dk);
 	Mars.move();
-
+	TextOut(hdc, Mars.kvadro_win[0].x, Mars.kvadro_win[0].y, "марс", 4);
 	dk = double(timer) / (ALL_STEP);
 	Earth.vt.x = X_SPACE_ANIM / 2 + 30 * cos(dk);
 	Earth.vt.y = Y_SPACE_ANIM / 2 + 30 * sin(dk);
 	Earth.move();
+	TextOut(hdc, Earth. kvadro_win[0].x, Earth.kvadro_win[0].y, "земля", 5);
 
 
 
