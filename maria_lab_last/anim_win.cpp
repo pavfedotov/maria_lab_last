@@ -67,7 +67,7 @@ BOOL   anim_main(HWND hwnd);
 
  // --- таймер ---
  // счётчик
-int timer = -1;
+int timer = -1, znak = 1, timer2;
 
 #define  K_GAB 0.05  // Габаритный  коэффициент отступа
 //  выводимого изображение от края границы вывода
@@ -102,7 +102,8 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		return anim_main(hwnd);
 
 	case WM_TIMER:
-		timer++;
+		timer+= znak;
+		timer2 ++;
 		InvalidateRect(hwnd, NULL, TRUE);
 		break;
 

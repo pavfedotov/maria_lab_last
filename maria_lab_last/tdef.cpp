@@ -89,6 +89,8 @@ void GO_SHAPE::move()
 
 	Ellipse(hdc, kvadro_win[1].x, kvadro_win[1].y, kvadro_win[3].x, kvadro_win[3].y);
 
+
+
 	if (vt.x > dim_x || vt.x < 0)
 	{
 		dx = -dx;

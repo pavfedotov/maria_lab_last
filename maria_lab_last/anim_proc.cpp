@@ -21,15 +21,15 @@
 
 #define  K_GAB    0.1           // Габаритный  коэффициент отступа
 								//  выводимого изображение от края границы вывода
-
+#define  G		 9.8
 #define  PI       3.14159265
 HDC hdc;
-
+static double k = 0;
 HBRUSH 	hbr[] = { CreateSolidBrush(RGB(255, 0, 0)),
-				  CreateSolidBrush(RGB(0, 255, 0)),
+				  CreateSolidBrush(RGB(0, 0, 0)),
 				  CreateSolidBrush(RGB(0, 0, 255)),
 				  CreateSolidBrush(RGB(255, 255, 255)),
-				  CreateSolidBrush(RGB(255, 205, 72)),
+				  CreateSolidBrush(RGB(255, 205, k)),
 				  CreateSolidBrush(RGB(127, 199, 255)),
 	CreateSolidBrush(RGB(193, 68, 14)),
 	CreateSolidBrush(RGB(173, 173, 173)),
@@ -40,8 +40,11 @@ hbr_prv;
 
 int pr_start = 0, all_br = sizeof(hbr) / sizeof(hbr[0]);
 
+HPEN pen = CreatePen(PS_SOLID, 3, RGB(255, 255, 255));
+double g = G;
+static double N = 0;
 CMatr  mpr;
-
+double v = 0;
 /********************************************************************/
 /*                        anim_main                                 */
 /*                        ==========                                */
@@ -54,51 +57,23 @@ CVect  sun[ALL_PT] =
 	{ -0.5,  -0.5 },
 	{  0.5,  -0.5 }
 };
-CVect  mercury[ALL_PT] =
-{ {  0.1,   0.1  },
-	{ -0.1,   0.1 },
-	{ -0.1,  -0.1 },
-	{  0.1,  -0.1 }
-};
-CVect venera[ALL_PT] =
-{ {  0.25,   0.25  },
-	{ -0.25,   0.25 },
-	{ -0.25,  -0.25},
-	{  0.25,  -0.25 }
-};
-CVect mars[ALL_PT] =
-{ {  0.15,   0.15  },
-	{ -0.15,   0.15 },
-	{ -0.15,  -0.15 },
-	{  0.15,  -0.15 }
-};
-CVect  earth[ALL_PT] =
-{ {  0.3,   0.3  },
-	{ -0.3,   0.3 },
-	{ -0.3,  -0.3 },
-	{  0.3,  -0.3 }
-};
+
+
 
 
 
 GO_SHAPE Sun(sun, 4, 0, 0, 0, K_SC, K_SC,
-	X_SPACE_ANIM / 2, Y_SPACE_ANIM / 2, SUN, X_SPACE_ANIM),
-	Mercury(mercury, 4, DX, DY, 0, K_SC, K_SC,
-		X_SPACE_ANIM, 0, MERK, X_SPACE_ANIM),
-	Venera(venera, 4, DX, DY, 0, K_SC, K_SC,
-		0, Y_SPACE_ANIM / 2, VEN, X_SPACE_ANIM),
-	Mars(mars, 4, DX, DY, 0, K_SC, K_SC,
-		X_SPACE_ANIM, 0, MARS, X_SPACE_ANIM),
-	Earth(earth, 4, DX, DY, 0, K_SC, K_SC,
-		X_SPACE_ANIM, 0, EARTH, X_SPACE_ANIM);
-
+	X_SPACE_ANIM / 2, 0, SUN, X_SPACE_ANIM),
+	line (sun, 4, 0, 0, 0, K_SC, K_SC,
+		X_SPACE_ANIM / 2, 0, 1, X_SPACE_ANIM);
+	
 
 BOOL  anim_main(HWND hwnd)
 {
 	int    i;
 	double dx, dy, ang;
 
-	extern int timer;
+	extern int timer, znak, timer2;
 
 	CVect vt;
 
@@ -111,11 +86,16 @@ BOOL  anim_main(HWND hwnd)
 		pr_start = 1;
 		EndPaint(hwnd, &ps);
 		return TRUE;
+		
 	}
 
 	// определить размеры клиентской области окна
 	if (timer == 0)
 	{
+		for (size_t i = 0; i < 255; i++)
+		{
+			hbr[i] = CreateSolidBrush(RGB(255, 205, i));
+		}
 		RECT rc;
 		GetClientRect(hwnd, &rc);
 
@@ -125,31 +105,45 @@ BOOL  anim_main(HWND hwnd)
 	/*---------------------------------------*/
 	/*      Текущая перерисовка              */
 	/*---------------------------------------*/
+	Sun.vt.x = X_SPACE_ANIM/2;
 	
+
+	line.vt.x = X_SPACE_ANIM / 2;
+	line.vt.y = Y_SPACE_ANIM / 2;
+
+
+
 	
-	Sun.move();
 
-	double dk = double(timer + 1300) / (ALL_STEP / 6);
-	Mercury.vt.x = X_SPACE_ANIM / 2 + 10 * cos(dk);
-	Mercury.vt.y = Y_SPACE_ANIM / 2 + 10 * sin(dk);
-	Mercury.move();
-	TextOut(hdc, Mercury.kvadro_win[0].x, Mercury.kvadro_win[0].y, "меркурий", 8);
-	dk = double(timer + 1000) / (ALL_STEP / 4);
-	Venera.vt.x = X_SPACE_ANIM / 2 + 20 * cos(dk);
-	Venera.vt.y = Y_SPACE_ANIM / 2 + 20 * sin(dk);
-	Venera.move();
-	TextOut(hdc, Venera.kvadro_win[0].x, Venera.kvadro_win[0].y, "венера", 6);
-	dk = double(timer + 3000) / (ALL_STEP / 2);
-	Mars.vt.x = X_SPACE_ANIM / 2 + 40 * cos(dk);
-	Mars.vt.y = Y_SPACE_ANIM / 2 + 40 * sin(dk);
-	Mars.move();
-	TextOut(hdc, Mars.kvadro_win[0].x, Mars.kvadro_win[0].y, "марс", 4);
-	dk = double(timer) / (ALL_STEP);
-	Earth.vt.x = X_SPACE_ANIM / 2 + 30 * cos(dk);
-	Earth.vt.y = Y_SPACE_ANIM / 2 + 30 * sin(dk);
-	Earth.move();
-	TextOut(hdc, Earth. kvadro_win[0].x, Earth.kvadro_win[0].y, "земля", 5);
+	//line.move();
 
+	//
+	//SelectObject(hdc, pen);
+
+	//MoveToEx(hdc, line.kvadro_win[2].x, line.kvadro_win[2].y, NULL);
+	//LineTo(hdc, line.kvadro_win[3].x, line.kvadro_win[3].y);
+	
+	Sun.color = k;
+	k = k + 2;
+
+	
+	v = (timer * g);
+
+	
+	Sun.vt.y = (Y_SPACE_ANIM)-((v * timer) + ((pow(timer, 2) * g) / 2)) / 1000;
+
+
+		if (Sun.vt.y <= Y_SPACE_ANIM/2 ) {
+		
+			znak = -znak;
+			k = 0;
+		}
+		
+		
+	
+		Sun.move();
+
+		
 
 
 
